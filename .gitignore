@@ -16,14 +16,7 @@ Thumbs.db
 .env.*
 
 # Pterodactyl panel & wings runtime data
-/pterodactyl/database
-/pterodactyl/panel
-/pterodactyl/wings/lib/
-/pterodactyl/wings/logs/
-/pterodactyl/eggs/
-/pterodactyl/logs/
-/pterodactyl/backups/
-/pterodactyl/docs/
+/pterodactyl
 /backups/
 /data/
 

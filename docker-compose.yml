@@ -1,3 +1,4 @@
+version: '3.8'
 
 services:
   database:
@@ -21,11 +22,11 @@ services:
       - mcnet
 
   panel:
-    image: ghcr.io/pterodactyl/panel:v1.12.1
+    image: ghcr.io/pterodactyl/panel:latest
     restart: always
-    ports:
-      - "${PANEL_PORT_HTTP:-}"
-      - "${PANEL_PORT_HTTPS:-}"
+    # ports:
+    #   - "${PANEL_PORT_HTTP:-}"
+    #   - "${PANEL_PORT_HTTPS:-}"
     links:
       - database
       - cache
@@ -63,8 +64,8 @@ services:
     image: ghcr.io/pterodactyl/wings:latest
     restart: always
     privileged: true
-    ports:
-      - "${WINGS_PORT_MAPPING:-}"
+    # ports:
+    #   - "${WINGS_PORT_MAPPING:-}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./pterodactyl/wings/lib:/var/lib/pterodactyl
