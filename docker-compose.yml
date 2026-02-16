@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   database:
@@ -12,14 +11,10 @@ services:
       MYSQL_USER: "${MYSQL_USER:-${DB_USERNAME}}"
       MYSQL_PASSWORD: "${MYSQL_PASSWORD:-${DB_PASSWORD}}"
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-    networks:
-      - mcnet
 
   cache:
     image: redis:alpine
     restart: always
-    networks:
-      - mcnet
 
   panel:
     image: ghcr.io/pterodactyl/panel:v1.11.11
@@ -31,11 +26,10 @@ services:
       - database
       - cache
     volumes:
-      - /srv/pterodactyl/panel/app:/app
-      # - /srv/pterodactyl/panel/var:/app/var
-      - /srv/pterodactyl/panel/nginx:/etc/nginx/http.d
-      - /srv/pterodactyl/panel/certs:/etc/letsencrypt
-      # - /srv/pterodactyl/panel/logs:/app/storage/logs
+      - "/srv/pterodactyl/var/:/app/var/"
+      - "/srv/pterodactyl/nginx/:/etc/nginx/http.d/"
+      - "/srv/pterodactyl/certs/:/etc/letsencrypt/"
+      - "/srv/pterodactyl/logs/:/app/storage/logs"
     environment:
       APP_ENV: "${APP_ENV}"
       APP_ENVIRONMENT_ONLY: "${APP_ENVIRONMENT_ONLY}"
@@ -58,27 +52,9 @@ services:
       MAIL_USERNAME: "${MAIL_USERNAME}"
       MAIL_PASSWORD: "${MAIL_PASSWORD}"
       MAIL_ENCRYPTION: "${MAIL_ENCRYPTION}"
-    networks:
-      - mcnet
-
-  wings:
-    image: ghcr.io/pterodactyl/wings:latest
-    restart: always
-    privileged: true
-    # ports:
-    #   - "${WINGS_PORT_MAPPING:-}"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /srv/pterodactyl/wings/lib:/var/lib/pterodactyl
-      - /srv/pterodactyl/wings/logs:/var/log/pterodactyl
-      - /srv/pterodactyl/wings/config:/etc/pterodactyl
-    environment:
-      TZ: "${APP_TIMEZONE}"
-      WINGS_UID: "${WINGS_UID}"
-      WINGS_GID: "${WINGS_GID}"
-    networks:
-      - mcnet
 
 networks:
-  mcnet:
-    external: false
+  default:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
