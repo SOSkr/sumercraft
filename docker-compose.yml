@@ -31,10 +31,10 @@ services:
       - database
       - cache
     volumes:
-      - /srv/pterodactyl/panel/var:/app/var
+      - /srv/pterodactyl/panel/app:/app
       - /srv/pterodactyl/panel/nginx:/etc/nginx/http.d
       - /srv/pterodactyl/panel/certs:/etc/letsencrypt
-      - /srv/pterodactyl/panel/logs:/app/storage/logs
+      # - /srv/pterodactyl/panel/logs:/app/storage/logs
     environment:
       APP_ENV: "${APP_ENV}"
       APP_ENVIRONMENT_ONLY: "${APP_ENVIRONMENT_ONLY}"
