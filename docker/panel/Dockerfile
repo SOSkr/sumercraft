@@ -14,17 +14,17 @@ RUN wget "$(curl -s https://api.github.com/repos/BlueprintFramework/framework/re
 	&& unzip -o release.zip \
 	&& rm release.zip
 
-# Install Node.js dependencies for Blueprint
-RUN npm i -g yarn && yarn install
+# # Install Node.js dependencies for Blueprint
+# RUN npm i -g yarn && yarn install
 
-# Make blueprint.sh executable and run it with bash
-RUN chmod +x /app/blueprint.sh && bash /app/blueprint.sh
+# # Make blueprint.sh executable and run it with bash
+# RUN chmod +x /app/blueprint.sh && bash /app/blueprint.sh
 
-# Copy custom entrypoint script to container root
-COPY docker/panel/scripts/entrypoint.sh /entrypoint.sh
+# # Copy custom entrypoint script to container root
+# COPY docker/panel/scripts/entrypoint.sh /entrypoint.sh
 
-# Make entrypoint script executable
-RUN chmod +x /entrypoint.sh
+# # Make entrypoint script executable
+# RUN chmod +x /entrypoint.sh
 
-# Use custom entrypoint to ensure runtime configuration and permissions
-ENTRYPOINT ["/entrypoint.sh"]
+# # Use custom entrypoint to ensure runtime configuration and permissions
+# ENTRYPOINT ["/entrypoint.sh"]
