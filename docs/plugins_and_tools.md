@@ -9,6 +9,7 @@
 
 - [Tebex](https://www.tebex.io/): Payment and donation platform for Minecraft servers.
 - [Discourse](https://github.com/discourse/discourse): Open-source forum software for community management.
+- [Laracord](https://laracord.com/docs/2.x/installation): Laracord is a micro-framework that provides a beautiful starting point for your next Discord bot.
 
 ## Recommended Reading
 
