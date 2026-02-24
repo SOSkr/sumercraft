@@ -1,50 +1,89 @@
-
 services:
 
   cache:
-    image: redis:alpine
+    image: valkey/valkey:alpine
     restart: always
+    command: >
+      --requirepass "${REDIS_PASSWORD}"
+    environment:
+      REDISCLI_AUTH: "${REDIS_PASSWORD}"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - pterodactyl_stack
 
   panel:
-    build:
-      context: .
-      dockerfile: docker/panel/Dockerfile
+    image: ghcr.io/blueprintframework/blueprint:v1.12.1
     restart: always
-    # ports:
-    #   - "${PANEL_PORT_HTTP:-}"
-    #   - "${PANEL_PORT_HTTPS:-}"
     links:
       - cache
     volumes:
-      - "/srv/pterodactyl/var/:/app/var/"
-      - "/srv/pterodactyl/nginx/:/etc/nginx/http.d/"
-      - "/srv/pterodactyl/certs/:/etc/letsencrypt/"
-      - "/srv/pterodactyl/logs/:/app/storage/logs"
+      - "${BASE_DIR}/var/:/app/var/"
+      - "${BASE_DIR}/nginx/:/etc/nginx/http.d/"
+      - "${BASE_DIR}/certs/:/etc/letsencrypt/live:ro"
+      - "${BASE_DIR}/logs/:/app/storage/logs"
+      - "${BASE_DIR}/nginx/logs:/var/log/nginx"
+      - "${BASE_DIR}/extensions/:/blueprint_extensions"
+      - "app:/app"
     environment:
+      APP_DEBUG: "${APP_DEBUG}"
       APP_ENV: "${APP_ENV}"
       APP_ENVIRONMENT_ONLY: "${APP_ENVIRONMENT_ONLY}"
+      APP_NAME: "${APP_NAME}"
       APP_URL: "${APP_URL}"
       APP_TIMEZONE: "${APP_TIMEZONE}"
       APP_SERVICE_AUTHOR: "${APP_SERVICE_AUTHOR}"
-      CACHE_DRIVER: "${CACHE_DRIVER}"
-      SESSION_DRIVER: "${SESSION_DRIVER}"
-      QUEUE_DRIVER: "${QUEUE_DRIVER}"
-      REDIS_HOST: "${REDIS_HOST}"
+      RECAPTCHA_ENABLED: "${RECAPTCHA_ENABLED}"
+      RECAPTCHA_WEBSITE_KEY: "${RECAPTCHA_SITE_KEY}"
+      RECAPTCHA_SECRET_KEY: "${RECAPTCHA_SECRET_KEY}"
+      APP_2FA_REQUIRED: "${APP_2FA_REQUIRED}"
+      PTERODACTYL_CLIENT_ALLOCATIONS_ENABLED: "${AUTO_ALLOCATION}"
+      PTERODACTYL_CLIENT_ALLOCATIONS_RANGE_START: "${AUTO_ALLOCATION_START_PORT}"
+      PTERODACTYL_CLIENT_ALLOCATIONS_RANGE_END: "${AUTO_ALLOCATION_END_PORT}"
+
       DB_HOST: "${DB_HOST}"
       DB_PORT: "${DB_PORT}"
       DB_DATABASE: "${DB_DATABASE}"
       DB_USERNAME: "${DB_USERNAME}"
       DB_PASSWORD: "${DB_PASSWORD}"
-      MAIL_FROM: "${MAIL_FROM}"
+      HASHIDS_SALT: "${HASHIDS_SALT}"
+      HASHIDS_LENGTH: "${HASHIDS_LENGTH}"
+
+      CACHE_DRIVER: "${CACHE_DRIVER}"
+      SESSION_DRIVER: "${SESSION_DRIVER}"
+      QUEUE_DRIVER: "${QUEUE_DRIVER}"
+      REDIS_HOST: "${REDIS_HOST}"
+      REDIS_PASSWORD: "${REDIS_PASSWORD}"
+
+      MAIL_FROM_ADDRESS: "no-reply@${DOMAIN}"
+      MAIL_FROM_NAME: "${APP_NAME}"
       MAIL_DRIVER: "${MAIL_DRIVER}"
-      MAIL_HOST: "${MAIL_HOST}"
-      MAIL_PORT: "${MAIL_PORT}"
-      MAIL_USERNAME: "${MAIL_USERNAME}"
-      MAIL_PASSWORD: "${MAIL_PASSWORD}"
-      MAIL_ENCRYPTION: "${MAIL_ENCRYPTION}"
+      MAIL_HOST: "${SMTP_SERVER}"
+      MAIL_PORT: "${SMTP_PORT}"
+      MAIL_USERNAME: "${SMTP_USERNAME}"
+      MAIL_PASSWORD: "${SMTP_APIKEY}"
+      MAIL_ENCRYPTION: "${SMTP_ENCRYPTION}"
+      MAIL_EHLO_DOMAIN: "no-reply@${DOMAIN}"
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:${PANEL_PORT}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - pterodactyl_stack
 
 networks:
-  default:
+  pterodactyl_stack:
+    driver: bridge
     ipam:
+      driver: default
       config:
-        - subnet: 172.20.0.0/16
+        - subnet: "172.20.0.0/24"
+
+volumes:
+  app:

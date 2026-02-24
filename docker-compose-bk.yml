@@ -1,0 +1,50 @@
+
+services:
+
+  cache:
+    image: redis:alpine
+    restart: always
+
+  panel:
+    build:
+      context: .
+      dockerfile: docker/panel/Dockerfile
+    restart: always
+    # ports:
+    #   - "${PANEL_PORT_HTTP:-}"
+    #   - "${PANEL_PORT_HTTPS:-}"
+    links:
+      - cache
+    volumes:
+      - "/srv/pterodactyl/var/:/app/var/"
+      - "/srv/pterodactyl/nginx/:/etc/nginx/http.d/"
+      - "/srv/pterodactyl/certs/:/etc/letsencrypt/"
+      - "/srv/pterodactyl/logs/:/app/storage/logs"
+    environment:
+      APP_ENV: "${APP_ENV}"
+      APP_ENVIRONMENT_ONLY: "${APP_ENVIRONMENT_ONLY}"
+      APP_URL: "${APP_URL}"
+      APP_TIMEZONE: "${APP_TIMEZONE}"
+      APP_SERVICE_AUTHOR: "${APP_SERVICE_AUTHOR}"
+      CACHE_DRIVER: "${CACHE_DRIVER}"
+      SESSION_DRIVER: "${SESSION_DRIVER}"
+      QUEUE_DRIVER: "${QUEUE_DRIVER}"
+      REDIS_HOST: "${REDIS_HOST}"
+      DB_HOST: "${DB_HOST}"
+      DB_PORT: "${DB_PORT}"
+      DB_DATABASE: "${DB_DATABASE}"
+      DB_USERNAME: "${DB_USERNAME}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      MAIL_FROM: "${MAIL_FROM}"
+      MAIL_DRIVER: "${MAIL_DRIVER}"
+      MAIL_HOST: "${MAIL_HOST}"
+      MAIL_PORT: "${MAIL_PORT}"
+      MAIL_USERNAME: "${MAIL_USERNAME}"
+      MAIL_PASSWORD: "${MAIL_PASSWORD}"
+      MAIL_ENCRYPTION: "${MAIL_ENCRYPTION}"
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
