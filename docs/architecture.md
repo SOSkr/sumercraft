@@ -22,7 +22,7 @@ flowchart LR
     A["Players (Java/Bedrock)"]
     B["Velocity Proxy Java (Pterodactyl)"]
     C["Velocity Proxy Bedrock (Pterodactyl)"]
-    D["Pterodactyl Game Servers (Lobby, Survival, Plots, etc.)"]
+    D["Pterodactyl Game Servers (Auth, Lobby, Survival, Plots, etc.)"]
 
     A -- Java --> B
     A -- Bedrock --> C
@@ -38,7 +38,7 @@ flowchart LR
 - **Velocity Bedrock**: Proxy for Bedrock Edition players, kept updated to the latest Bedrock-supported Velocity version.
 
 ### Game Servers
-- All Minecraft servers (Lobby, Survival, Plots, etc.).
+- All Minecraft servers (Auth, Lobby, Survival, Plots, etc.).
 - Multi-user, backup, and resource management features.
 
 ## Networking

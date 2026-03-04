@@ -12,34 +12,40 @@
 
 ---
 
-## Servers
+### Node 1 (100% resources)
+| Server        | CPU Limit (%) | Memory (MiB) | Disk Space (MiB) |
+|---------------|---------------|--------------|------------------|
+| Velocity Java | 30            | 512          | 512              |
+| Lobby 1       | 40            | 1024         | 1024             |
+| Plot Creative | 120           | 5120         | 24576            |
+| Skywars       | 60            | 2560         | 12288            |
+| **Total**     | **250**       | **9216**     | **38300**        |
+| **Node Max**  | **400**       | **24576**    | **768000**       |
 
-| Server           | CPU Limit (%) | CPU Pinning | Memory (MiB) | Swap (MiB) | Disk Space (MiB) | Block IO Weight | OOM Killer |
-|------------------|---------------|-------------|--------------|------------|------------------|-----------------|------------|
-| Velocity Java    | 200           |             | 1024         | 0          | 2048             | 500             | Yes        |
-| Velocity Bedrock | 200           |             | 1024         | 0          | 2048             | 500             | Yes        |
-| Lobby            | 200           |             | 1024         | 0          | 2048             | 500             | Yes        |
-| Lobby 2          | 200           |             | 1024         | 0          | 2048             | 500             | Yes        |
-| Plot Creative    | 200           |             | 4096         | 0          | 20480            | 500             | Yes        |
-| Survival         | 200           |             | 4096         | 0          | 20480            | 500             | Yes        |
-| Arena PvP        | 100           |             | 2048         | 0          | 10240            | 500             | Yes        |
-| Skywars          | 100           |             | 2048         | 0          | 10240            | 500             | Yes        |
+### Node 2 (70% resources)
+| Server           | CPU Limit (%) | Memory (MiB) | Disk Space (MiB) |
+|------------------|---------------|--------------|------------------|
+| Velocity Bedrock | 30            | 512          | 512              |
+| Auth             | 40            | 512          | 512              |
+| Lobby 2          | 40            | 1024         | 1024             |
+| Survival         | 100           | 5120         | 24576            |
+| Arena PvP        | 60            | 2560         | 12288            |
+| **Total**        | **270**       | **9728**     | **38912**        |
+| **Node Max**     | **280**       | **24576**    | **768000**       |
 
+**Resource Field Recommendations:**
+- **CPU Pinning:** Leave blank for all servers. This allows Docker and the OS to schedule CPU dynamically for best performance. Only set if you need strict isolation.
+- **Swap (MiB):** Set to 0 for all servers. Disabling swap prevents lag spikes due to swapping. If a server runs out of RAM, the OOM Killer will safely restart it.
+- **Block IO Weight:** Use 500 for all servers (Docker default). Only change if you have a server that needs disk priority (rare for Minecraft).
+- **OOM Killer:** Set to "Yes" for all servers. This ensures that if a server exceeds its memory allocation, it will be killed and restarted, protecting the rest of the node.
 
-- **CPU Limit:** 100 = 1 core/thread, 200 = 2 cores/threads, etc.
-- **CPU Pinning:** Leave blank to allow all threads.
-- **OOM Killer:** Yes = enabled (recommended to avoid hangs due to memory overuse).
+*These defaults are safe and effective for most Minecraft network setups. Adjust only if you have special requirements.*
 
----
+#### Node Resource Limits
+- Node 1: 4 cores (400%), 32 GB RAM (32768 MiB), 921600 MiB Disk
+- Node 2: 2.8 cores (280%), 22.4 GB RAM (22938 MiB), 645120 MiB Disk (70% usable)
 
-## Network and Backend Summary Table
-
-| Service   | Panel Allocation        | server.properties | Velocity backend address  | Publicly Exposed? |
-|-----------|-------------------------|-------------------|---------------------------|-------------------|
-| Velocity  | Public IP:26510         | N/A               | N/A                       | Yes               |
-| Lobby     | 127.0.0.1:26520         | 0.0.0.0:26520     | <container_name>:26520    | No                |
-
-_The easiest way to find the correct value for <container_name> is to use the UUID shown in the Pterodactyl panel under the server list. This UUID matches the container name in Docker._
+*All values are within safe limits for each node. Adjust as needed for future growth.*
 
 ---
 
@@ -72,6 +78,7 @@ If you have two dedicated servers, a simple and effective way to distribute the 
 
 **Node 2:**
 - Velocity Bedrock
+- Auth
 - Lobby 2
 - Plot Creative
 - Arena PvP
